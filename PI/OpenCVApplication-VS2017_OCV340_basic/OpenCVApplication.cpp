@@ -621,6 +621,259 @@ void determineInverse(){
 
 }
 
+//Lab2 - Color spaces
+
+/*
+ * Ex1.
+ */
+void copyRGBChannels()
+{
+	Mat src, dstR, dstG, dstB;
+
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		src = imread(fname, CV_LOAD_IMAGE_COLOR);
+
+		int height = src.rows;
+		int width = src.cols;
+
+		dstR = Mat(height, width, CV_8UC3);
+		dstG = Mat(height, width, CV_8UC3);
+		dstB = Mat(height, width, CV_8UC3);
+
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+					Vec3b channels = src.at<Vec3b>(i, j);
+					uchar channelB = channels[0];
+					uchar channelG = channels[1];
+					uchar channelR = channels[2];
+
+					dstR.at<Vec3b>(i, j) = Vec3b(0, 0, channelR);
+					dstG.at<Vec3b>(i, j) = Vec3b(0, channelG, 0);
+					dstB.at<Vec3b>(i, j) = Vec3b(channelB, 0, 0);
+			}
+		}
+
+		imshow("input image", src);
+		imshow("imageR", dstR);
+		imshow("imageG", dstG);
+		imshow("imageB", dstB);
+		waitKey();
+
+	}
+	
+}
+
+void color2Grayscale()
+{
+	Mat src, dst;
+
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		src = imread(fname, CV_LOAD_IMAGE_COLOR);
+
+		int height = src.rows;
+		int width = src.cols;
+
+		dst = Mat(height, width, CV_8UC1);
+
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				Vec3b channels = src.at<Vec3b>(i, j);
+				uchar channelB = channels[0];
+				uchar channelG = channels[1];
+				uchar channelR = channels[2];
+
+				uchar grayValue = (channelB + channelG + channelR) / 3;
+
+				dst.at<uchar>(i, j) = grayValue;
+			}
+		}
+
+		imshow("input image", src);
+		imshow("gray image", dst);
+		waitKey();
+
+	}
+	
+}
+
+void Grayscale2Binary()
+{
+	Mat src, dst;
+
+	float threshold;
+
+	std::cin >> threshold;
+
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+
+		int height = src.rows;
+		int width = src.cols;
+
+		dst = Mat(height, width, CV_8UC1);
+
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				uchar value = src.at<uchar>(i, j);
+
+				if (value >= threshold)
+				{
+					dst.at<uchar>(i, j) = 255;
+				}
+				else
+				{
+					dst.at<uchar>(i, j) = 0;
+				}
+
+				
+			}
+		}
+
+
+		imshow("input image", src);
+		imshow("binary image", dst);
+		waitKey();
+
+	}
+	
+}
+
+void BGR2HSV()
+{
+	Mat src, dstH, dstS, dstV;
+
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		src = imread(fname, CV_LOAD_IMAGE_COLOR);
+
+		int height = src.rows;
+		int width = src.cols;
+
+		dstH = Mat(height, width, CV_8UC1);
+		dstS = Mat(height, width, CV_8UC1);
+		dstV = Mat(height, width, CV_8UC1);
+
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				Vec3b channels = src.at<Vec3b>(i, j);
+				uchar channelB = channels[0];
+				uchar channelG = channels[1];
+				uchar channelR = channels[2];
+
+				float r = (float)channelR / 255;
+				float g = (float)channelG / 255;
+				float b = (float)channelB / 255;
+
+				float max_rg = max(r,g);
+				float max = max(max_rg, b);
+
+				float min_rg = min(r, g);
+				float min = min(min_rg, b);
+
+				float chroma = max - min;
+
+				//value
+				float value = max;
+
+				//saturation
+				float saturation = 0.0f;
+				if (value!=0)
+				{
+					saturation = chroma / value;
+				}
+				else
+				{
+					saturation = 0;
+				}
+
+				//hue
+				float hue = 0.0f;
+				if (chroma!=0)
+				{
+					if (max == r)
+					{
+						hue = 60 * (g - b) / chroma;
+					}
+					else if (max == g)
+					{
+						hue = 120 + 60 * (b - r) / chroma;
+					}
+					else if (max == b)
+					{
+						hue = 240 + 60 * (r - g) / chroma;
+					}
+				}
+				else
+				{
+					hue = 0;
+				}
+				if (hue < 0)
+				{
+					hue = hue + 360;
+				}
+
+				dstH.at<uchar>(i, j) = hue * 255 / 360;
+				dstS.at<uchar>(i, j) = saturation * 255;
+				dstV.at<uchar>(i, j) = value * 255;
+			}
+		}
+
+		imshow("input image", src);
+		imshow("imageH", dstH);
+		imshow("imageS", dstS);
+		imshow("imageV", dstV);
+		waitKey();
+
+	}
+	
+
+}
+
+void isInside()
+{
+	Mat img;
+
+	int row, col;
+
+	std::cin >> row;
+	std::cin >> col;
+
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+
+		int height = img.rows;
+		int width = img.cols;
+
+		if ( row >= 0 && row < height && col >= 0 && col < width)
+		{
+			std::cout << "Is inside!";
+			
+		}
+		else
+		{
+			std::cout << "Is not inside!";
+		}
+	}
+	
+}
+
 
 int main()
 {
@@ -644,6 +897,11 @@ int main()
 		printf(" 12 - Change gray level by a multiplicative factor\n");
 		printf(" 13 - Create a random color image\n");
 		printf(" 14 - The inverse of matrix\n");
+		printf(" 15 - Copy RGB channels into 3 matrices\n");
+		printf(" 16 - Convert a color image into a grayscale image\n");
+		printf(" 17 - Convert a grayscale image into a binary image\n");
+		printf(" 18 - BGR->HSV without cvtcolor\n");
+		printf(" 19 - Check if pair (i,j) is inside the image\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -692,6 +950,21 @@ int main()
 			case 14:
 				determineInverse();
 				break;
+			case 15:
+				copyRGBChannels();
+				break;
+			case 16:
+				color2Grayscale();
+				break;
+			case 17:
+				Grayscale2Binary();
+				break;
+			case 18:
+				BGR2HSV();
+				break;
+			case 19:
+				isInside();
+				break;		
 
 		}
 	}
