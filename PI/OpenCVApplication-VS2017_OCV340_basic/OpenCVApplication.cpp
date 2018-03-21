@@ -5,6 +5,21 @@
 #include "stdafx.h"
 #include "common.h"
 
+typedef struct
+{
+	Mat image;
+	Point p;
+	Vec3b rgb;
+
+}MouseParams;
+
+typedef struct
+{
+	double r_i;
+	double c_i;
+
+}CenterOfMass;
+
 
 void testOpenImage()
 {
@@ -82,8 +97,10 @@ void testNegativeImage()
 		double t = (double)getTickCount(); // Get the current time [s]
 		
 		Mat src = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
+
 		int height = src.rows;
 		int width = src.cols;
+
 		Mat dst = Mat(height,width,CV_8UC1);
 
 		// Asa se acceseaaza pixelii individuali pt. o imagine cu 8 biti/pixel
@@ -153,7 +170,7 @@ void testColor2Gray()
 		int width = src.cols;
 
 		Mat dst = Mat(height,width,CV_8UC1);
-
+		
 		// Asa se acceseaaza pixelii individuali pt. o imagine RGB 24 biti/pixel
 		// Varianta ineficienta (lenta)
 		for (int i=0; i<height; i++)
@@ -874,6 +891,359 @@ void isInside()
 	
 }
 
+//Lab 3 - Geometrical features
+
+
+int calculateArea(MouseParams *mp)
+{
+	int area = 0;
+
+	Mat img = mp->image;
+
+	int height = img.rows;
+	int width = img.cols;
+
+	for (int r = 0; r < height; r++)
+		for (int c = 0; c < width; c++)
+		{
+			Vec3b color = img.at<Vec3b>(r, c);
+
+			if (color == mp->rgb)
+			{
+				area++;
+			}
+
+		}
+	
+	return area;
+	
+}
+
+CenterOfMass calculateCenterOfMass(MouseParams *mp)
+{
+	double r_i = 0.0f , c_i = 0.0f;
+	Mat img = mp->image;
+
+	int height = img.rows;
+	int width = img.cols;
+
+	CenterOfMass center_of_mass;
+
+	for (int r = 0; r < height; r++)
+		for (int c = 0; c < width; c++)
+		{
+			Vec3b color = img.at<Vec3b>(r, c);
+			if (color == mp->rgb)
+			{
+				r_i += r;
+				c_i += c;
+			}
+
+		}
+
+	r_i = r_i / calculateArea(mp);
+	c_i = c_i / calculateArea(mp);
+
+	center_of_mass.r_i = r_i;
+	center_of_mass.c_i = c_i;
+
+	return center_of_mass;
+	
+}
+
+double calculateAxisOfElongation(MouseParams *mp)
+{
+	Mat img = mp->image;
+
+	int height = img.rows;
+	int width = img.cols;
+
+	CenterOfMass center_of_mass = calculateCenterOfMass(mp);
+
+	double num = 0.0f;
+	double denom1 = 0.0f , denom2 = 0.0f;
+
+	double axisValue;
+
+	for (int r = 0; r < height; r++)
+		for (int c = 0; c < width; c++)
+		{
+			Vec3b color = img.at<Vec3b>(r, c);
+
+			if (color == mp->rgb)
+			{
+				num += (r - center_of_mass.r_i)*(c - center_of_mass.c_i);
+				denom1 += (c - center_of_mass.c_i)*(c - center_of_mass.c_i);
+				denom2 += (r - center_of_mass.r_i)*(r - center_of_mass.r_i);
+			}
+
+		}
+
+	axisValue = (atan2(2 * num, denom1 - denom2) / 2.0f);
+
+	return axisValue;
+}
+
+boolean findWhitePixel(int r, int c, Mat img)
+{	
+	Vec3b color;
+
+	for (int i = -1; i <= 1; i++)
+		for (int j = -1; j <= 1; j++)
+		{
+			color = img.at<Vec3b>(r + i, c + j);
+			if (color == Vec3b(255, 255, 255))
+			{
+				return true;
+
+			}
+		}
+
+	return false;
+	
+}
+
+int calculatePerimeter(Mat dst, MouseParams *mp)
+{
+	int perimeter = 0;
+
+	Mat img = mp->image;
+
+	int height = img.rows;
+	int width = img.cols;
+
+	for (int r = 0; r < height; r++)
+		for (int c = 0; c < width; c++)
+		{
+			Vec3b color = img.at<Vec3b>(r, c);
+
+			if (color == mp->rgb)
+			{
+				if (findWhitePixel(r,c,img))
+				{
+					dst.at<Vec3b>(r, c) = Vec3b(0, 0, 0);
+					perimeter++;
+				}
+				
+			}
+
+		}
+
+	return perimeter;
+	
+}
+
+double calculateThinnessRatio(Mat dst, MouseParams *mp)
+{	
+	int area = calculateArea(mp);
+	int perimeter = calculatePerimeter(dst, mp);
+
+	double T = 4 * PI * ( (double)area / (perimeter * perimeter));
+	
+	return T;
+		
+}
+
+double calculateAspectRatio(MouseParams *mp)
+{
+	double R = 0;
+
+	int c_max = INT_MIN;
+	int r_max = INT_MIN;
+	int c_min = INT_MAX;
+	int r_min = INT_MAX;
+
+	Mat img = mp->image;
+
+	int height = img.rows;
+	int width = img.cols;
+
+	for (int r = 0; r < height; r++)
+		for (int c = 0; c < width; c++)
+		{
+			Vec3b color = img.at<Vec3b>(r, c);
+			if (color == mp->rgb)
+			{
+				c_max = MAX(c_max, c);
+				r_max = MAX(r_max, r);
+				c_min = MIN(c_min, c);
+				r_min = MIN(r_min, r);
+			}
+
+		}
+
+	R = (double)(c_max - c_min + 1) / (r_max - r_min + 1);
+
+	return R;	
+}
+
+
+
+void horizontalProjection(Mat dst, MouseParams *mp)
+{
+	Mat img = mp->image;
+
+	int height = img.rows;
+
+	int width = img.cols;
+
+	int nrCols;
+
+	for (int r = 0; r < height; r++)
+	{	
+		nrCols = 0;
+		for (int c = 0; c < width; c++)
+		{
+			Vec3b color = img.at<Vec3b>(r, c);
+			if (color == mp->rgb)
+			{
+				nrCols++;
+			}
+
+		}
+
+		for (int j = 0; j < nrCols; j++)
+		{
+				dst.at<Vec3b>(r, j) = Vec3b(255, 255, 255);
+		}
+		
+	}
+
+	
+}
+
+void verticalProjection(Mat dst, MouseParams *mp)
+{
+	Mat img = mp->image;
+
+	int height = img.rows;
+
+	int width = img.cols;
+	int nrRows = 0;
+
+	for (int c = 0; c < width; c++)
+	{
+		nrRows = 0;
+		for (int r = 0; r < height; r++)
+		{
+			Vec3b color = img.at<Vec3b>(r, c);
+			if (color == mp->rgb)
+			{
+				nrRows++;
+			}
+
+		}
+
+		for (int j = 0; j < nrRows; j++)
+		{
+			dst.at<Vec3b>(j, c) = Vec3b(255, 255, 255);
+		}
+
+	}
+	
+}
+
+void DrawCross(Mat& img, Point p, int size, Scalar color, int thickness)
+{
+	line(img, Point(p.x - size / 2, p.y), Point(p.x + size / 2, p.y), color, thickness, 8);
+	line(img, Point(p.x, p.y - size / 2), Point(p.x, p.y + size / 2), color, thickness, 8);
+}
+
+void displayElongationAxis(Mat dst, double xc, double yc, double teta)
+{
+	int delta = 30; // arbitrary value
+	Point P1, P2;
+	P1.x = xc- delta;
+	P1.y = yc - (int)(delta*tan(teta)); // teta is the elongation angle in radians
+	P2.x = xc + delta;
+	P2.y = yc + (int)(delta*tan(teta));
+	line(dst, P1, P2, Scalar(0, 0, 0), 1, 8);
+
+}
+
+void onMouse(int event, int x, int y, int flags, void* param)
+{
+
+	MouseParams* mp = (MouseParams*)param;
+
+	Mat &src = mp->image;
+
+	Mat dst = src.clone();
+
+	Mat dst_proj = Mat(src.rows, src.cols, CV_8UC3);
+
+	//take the coordinates
+
+	if (event == CV_EVENT_LBUTTONDOWN)
+	{
+		mp->p = Point(y, x);
+		mp->rgb = src.at<Vec3b>(y, x);
+
+		printf("Pos(x,y): %d,%d  Color(RGB): %d,%d,%d\n",
+			x, y,
+			(int)(src).at<Vec3b>(y, x)[2],
+			(int)(src).at<Vec3b>(y, x)[1],
+			(int)(src).at<Vec3b>(y, x)[0]);
+
+		std::cout << "Area is " << calculateArea(mp) << std::endl;
+
+		CenterOfMass center_of_mass = calculateCenterOfMass(mp);
+
+		std::cout << "Center of mass " << center_of_mass.r_i << " " << center_of_mass.c_i << std::endl;
+
+		std::cout << "Axis of elongation " << calculateAxisOfElongation(mp) * 180 / PI << std::endl;
+
+		std::cout << "Perimeter is: " << calculatePerimeter(dst,mp) << std::endl;
+
+		std::cout << "Thinness Ratios is " << calculateThinnessRatio(dst, mp) << std::endl;
+
+		std::cout << "Aspect Ratio is " << calculateAspectRatio(mp) << std::endl;
+
+		std::cout << "Display center of mass " << std::endl;
+
+		DrawCross(dst, Point(center_of_mass.c_i, center_of_mass.r_i), 20, Scalar(255, 255, 255), 2);
+
+		std::cout << "Display axis of elongation " << std::endl;
+
+		displayElongationAxis(dst, center_of_mass.c_i, center_of_mass.r_i, calculateAxisOfElongation(mp));
+
+		horizontalProjection(dst_proj, mp);
+
+		verticalProjection(dst_proj, mp);
+
+		imshow("New Image", dst);
+		imshow(" New New Imgae", dst_proj);
+
+ 	}
+}
+
+
+
+void displayGeometricalFeatures()
+{
+	Mat src;
+	// Read image from file 
+	char fname[MAX_PATH];
+	MouseParams mp;
+
+	while (openFileDlg(fname))
+	{
+		src = imread(fname);
+		//Create a window
+		namedWindow("My Window", 1);
+
+		//set the callback function for any mouse event
+		mp.image = src;
+		setMouseCallback("My Window", onMouse, (void*)&mp);
+		
+		//show the image
+		imshow("My Window", mp.image);
+
+		// Wait until user press some key
+		waitKey(0);
+	}
+	
+}
 
 int main()
 {
@@ -902,6 +1272,9 @@ int main()
 		printf(" 17 - Convert a grayscale image into a binary image\n");
 		printf(" 18 - BGR->HSV without cvtcolor\n");
 		printf(" 19 - Check if pair (i,j) is inside the image\n");
+		printf(" 20 - Geometrical features of one selected binary object\n");
+		printf(" 21 - Keep objects that have their area < TH_area\n");
+		printf(" 22 - Keep objects that have a specific orientation phi\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -964,7 +1337,14 @@ int main()
 				break;
 			case 19:
 				isInside();
-				break;		
+				break;
+			case 20:
+				displayGeometricalFeatures();
+				break;
+			case 21:
+				break;
+			case 22:
+				break;
 
 		}
 	}
