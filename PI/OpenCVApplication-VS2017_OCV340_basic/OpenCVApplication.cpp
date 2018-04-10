@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "common.h"
+#include <random>
 
 typedef struct
 {
@@ -19,6 +20,12 @@ typedef struct
 	double c_i;
 
 }CenterOfMass;
+
+typedef struct
+{
+	int x, y; 
+	byte c; 
+}my_point;
 
 
 void testOpenImage()
@@ -894,11 +901,9 @@ void isInside()
 //Lab 3 - Geometrical features
 
 
-int calculateArea(MouseParams *mp)
+int calculateArea(Mat img, Vec3b rgb)
 {
 	int area = 0;
-
-	Mat img = mp->image;
 
 	int height = img.rows;
 	int width = img.cols;
@@ -908,7 +913,7 @@ int calculateArea(MouseParams *mp)
 		{
 			Vec3b color = img.at<Vec3b>(r, c);
 
-			if (color == mp->rgb)
+			if (color == rgb)
 			{
 				area++;
 			}
@@ -919,10 +924,9 @@ int calculateArea(MouseParams *mp)
 	
 }
 
-CenterOfMass calculateCenterOfMass(MouseParams *mp)
+CenterOfMass calculateCenterOfMass(Mat img, Vec3b rgb)
 {
 	double r_i = 0.0f , c_i = 0.0f;
-	Mat img = mp->image;
 
 	int height = img.rows;
 	int width = img.cols;
@@ -933,7 +937,7 @@ CenterOfMass calculateCenterOfMass(MouseParams *mp)
 		for (int c = 0; c < width; c++)
 		{
 			Vec3b color = img.at<Vec3b>(r, c);
-			if (color == mp->rgb)
+			if (color == rgb)
 			{
 				r_i += r;
 				c_i += c;
@@ -941,8 +945,8 @@ CenterOfMass calculateCenterOfMass(MouseParams *mp)
 
 		}
 
-	r_i = r_i / calculateArea(mp);
-	c_i = c_i / calculateArea(mp);
+	r_i = r_i / calculateArea(img, rgb);
+	c_i = c_i / calculateArea(img, rgb);
 
 	center_of_mass.r_i = r_i;
 	center_of_mass.c_i = c_i;
@@ -951,14 +955,12 @@ CenterOfMass calculateCenterOfMass(MouseParams *mp)
 	
 }
 
-double calculateAxisOfElongation(MouseParams *mp)
+double calculateAxisOfElongation(Mat img, Vec3b rgb)
 {
-	Mat img = mp->image;
-
 	int height = img.rows;
 	int width = img.cols;
 
-	CenterOfMass center_of_mass = calculateCenterOfMass(mp);
+	CenterOfMass center_of_mass = calculateCenterOfMass(img, rgb);
 
 	double num = 0.0f;
 	double denom1 = 0.0f , denom2 = 0.0f;
@@ -970,7 +972,7 @@ double calculateAxisOfElongation(MouseParams *mp)
 		{
 			Vec3b color = img.at<Vec3b>(r, c);
 
-			if (color == mp->rgb)
+			if (color == rgb)
 			{
 				num += (r - center_of_mass.r_i)*(c - center_of_mass.c_i);
 				denom1 += (c - center_of_mass.c_i)*(c - center_of_mass.c_i);
@@ -1003,11 +1005,9 @@ boolean findWhitePixel(int r, int c, Mat img)
 	
 }
 
-int calculatePerimeter(Mat dst, MouseParams *mp)
+int calculatePerimeter(Mat img, Mat dst, Vec3b rgb)
 {
 	int perimeter = 0;
-
-	Mat img = mp->image;
 
 	int height = img.rows;
 	int width = img.cols;
@@ -1017,7 +1017,7 @@ int calculatePerimeter(Mat dst, MouseParams *mp)
 		{
 			Vec3b color = img.at<Vec3b>(r, c);
 
-			if (color == mp->rgb)
+			if (color == rgb)
 			{
 				if (findWhitePixel(r,c,img))
 				{
@@ -1033,10 +1033,10 @@ int calculatePerimeter(Mat dst, MouseParams *mp)
 	
 }
 
-double calculateThinnessRatio(Mat dst, MouseParams *mp)
+double calculateThinnessRatio(Mat img, Mat dst, Vec3b rgb)
 {	
-	int area = calculateArea(mp);
-	int perimeter = calculatePerimeter(dst, mp);
+	int area = calculateArea(img, rgb);
+	int perimeter = calculatePerimeter(img, dst, rgb);
 
 	double T = 4 * PI * ( (double)area / (perimeter * perimeter));
 	
@@ -1044,7 +1044,7 @@ double calculateThinnessRatio(Mat dst, MouseParams *mp)
 		
 }
 
-double calculateAspectRatio(MouseParams *mp)
+double calculateAspectRatio(Mat img, Vec3b rgb)
 {
 	double R = 0;
 
@@ -1053,8 +1053,6 @@ double calculateAspectRatio(MouseParams *mp)
 	int c_min = INT_MAX;
 	int r_min = INT_MAX;
 
-	Mat img = mp->image;
-
 	int height = img.rows;
 	int width = img.cols;
 
@@ -1062,7 +1060,7 @@ double calculateAspectRatio(MouseParams *mp)
 		for (int c = 0; c < width; c++)
 		{
 			Vec3b color = img.at<Vec3b>(r, c);
-			if (color == mp->rgb)
+			if (color == rgb)
 			{
 				c_max = MAX(c_max, c);
 				r_max = MAX(r_max, r);
@@ -1079,10 +1077,8 @@ double calculateAspectRatio(MouseParams *mp)
 
 
 
-void horizontalProjection(Mat dst, MouseParams *mp)
+void horizontalProjection(Mat img, Mat dst, Vec3b rgb)
 {
-	Mat img = mp->image;
-
 	int height = img.rows;
 
 	int width = img.cols;
@@ -1095,7 +1091,7 @@ void horizontalProjection(Mat dst, MouseParams *mp)
 		for (int c = 0; c < width; c++)
 		{
 			Vec3b color = img.at<Vec3b>(r, c);
-			if (color == mp->rgb)
+			if (color == rgb)
 			{
 				nrCols++;
 			}
@@ -1112,10 +1108,8 @@ void horizontalProjection(Mat dst, MouseParams *mp)
 	
 }
 
-void verticalProjection(Mat dst, MouseParams *mp)
+void verticalProjection(Mat img, Mat dst, Vec3b rgb)
 {
-	Mat img = mp->image;
-
 	int height = img.rows;
 
 	int width = img.cols;
@@ -1127,7 +1121,7 @@ void verticalProjection(Mat dst, MouseParams *mp)
 		for (int r = 0; r < height; r++)
 		{
 			Vec3b color = img.at<Vec3b>(r, c);
-			if (color == mp->rgb)
+			if (color == rgb)
 			{
 				nrRows++;
 			}
@@ -1164,20 +1158,25 @@ void displayElongationAxis(Mat dst, double xc, double yc, double teta)
 void onMouse(int event, int x, int y, int flags, void* param)
 {
 
-	MouseParams* mp = (MouseParams*)param;
+	//MouseParams* mp = (MouseParams*)param;
 
-	Mat &src = mp->image;
+	//Mat &src = mp->image;
+
+	Mat* src_pointer = (Mat*)param;
+	Mat src = *src_pointer;
 
 	Mat dst = src.clone();
 
 	Mat dst_proj = Mat(src.rows, src.cols, CV_8UC3);
 
+	Vec3b rgb;
 	//take the coordinates
 
 	if (event == CV_EVENT_LBUTTONDOWN)
 	{
-		mp->p = Point(y, x);
-		mp->rgb = src.at<Vec3b>(y, x);
+		//mp->p = Point(y, x);
+
+		rgb = src.at<Vec3b>(y, x);
 
 		printf("Pos(x,y): %d,%d  Color(RGB): %d,%d,%d\n",
 			x, y,
@@ -1185,19 +1184,19 @@ void onMouse(int event, int x, int y, int flags, void* param)
 			(int)(src).at<Vec3b>(y, x)[1],
 			(int)(src).at<Vec3b>(y, x)[0]);
 
-		std::cout << "Area is " << calculateArea(mp) << std::endl;
+		std::cout << "Area is " << calculateArea(src, rgb) << std::endl;
 
-		CenterOfMass center_of_mass = calculateCenterOfMass(mp);
+		CenterOfMass center_of_mass = calculateCenterOfMass(src, rgb);
 
 		std::cout << "Center of mass " << center_of_mass.r_i << " " << center_of_mass.c_i << std::endl;
 
-		std::cout << "Axis of elongation " << calculateAxisOfElongation(mp) * 180 / PI << std::endl;
+		std::cout << "Axis of elongation " << calculateAxisOfElongation(src, rgb) * 180 / PI << std::endl;
 
-		std::cout << "Perimeter is: " << calculatePerimeter(dst,mp) << std::endl;
+		std::cout << "Perimeter is: " << calculatePerimeter(src, dst, rgb) << std::endl;
 
-		std::cout << "Thinness Ratios is " << calculateThinnessRatio(dst, mp) << std::endl;
+		std::cout << "Thinness Ratios is " << calculateThinnessRatio(src, dst, rgb) << std::endl;
 
-		std::cout << "Aspect Ratio is " << calculateAspectRatio(mp) << std::endl;
+		std::cout << "Aspect Ratio is " << calculateAspectRatio(src, rgb) << std::endl;
 
 		std::cout << "Display center of mass " << std::endl;
 
@@ -1205,11 +1204,11 @@ void onMouse(int event, int x, int y, int flags, void* param)
 
 		std::cout << "Display axis of elongation " << std::endl;
 
-		displayElongationAxis(dst, center_of_mass.c_i, center_of_mass.r_i, calculateAxisOfElongation(mp));
+		displayElongationAxis(dst, center_of_mass.c_i, center_of_mass.r_i, calculateAxisOfElongation(src, rgb));
 
-		horizontalProjection(dst_proj, mp);
+		horizontalProjection(src, dst_proj, rgb);
 
-		verticalProjection(dst_proj, mp);
+		verticalProjection(src, dst_proj, rgb);
 
 		imshow("New Image", dst);
 		imshow(" New New Imgae", dst_proj);
@@ -1233,17 +1232,538 @@ void displayGeometricalFeatures()
 		namedWindow("My Window", 1);
 
 		//set the callback function for any mouse event
-		mp.image = src;
-		setMouseCallback("My Window", onMouse, (void*)&mp);
+		setMouseCallback("My Window", onMouse, (void*)&src);
 		
 		//show the image
-		imshow("My Window", mp.image);
+		imshow("My Window", src);
 
 		// Wait until user press some key
 		waitKey(0);
 	}
 	
 }
+
+
+void keepObjects(double threshold, int option)
+{	
+	Mat src, dst;
+	// Read image from file 
+	char fname[MAX_PATH];
+	std::vector<Vec3b> colors;
+	double object_features;
+
+	while (openFileDlg(fname))
+	{
+		src = imread(fname);
+
+		int height = src.rows;
+		int width = src.cols;
+
+		dst = Mat(height, width, CV_8UC3);
+
+		for (int r = 0; r < height; r++)
+			for (int c = 0; c < width; c++)
+			{
+				Vec3b pixel = src.at<Vec3b>(r, c);
+				
+				if (std::find(colors.begin(), colors.end(), pixel) == colors.end() && pixel != Vec3b(255, 255, 255))
+				{	
+
+					if (option)
+					{
+						object_features = calculateArea(src, pixel);
+					}
+					else
+					{
+						object_features = calculateAxisOfElongation(src, pixel);
+					}
+						
+
+					if (object_features <= threshold)
+					{
+						calculatePerimeter(src, dst, pixel);
+					}
+					colors.push_back(pixel);
+
+				}
+			}
+
+		imshow("New image", dst);
+
+		waitKey(0);
+	}
+	
+}
+
+//Lab 4 - Label objects
+
+void colorImage(Mat labels, int label, Mat dst)
+{
+	std::default_random_engine gen;
+	std::uniform_int_distribution<int> d(0, 255);
+	Vec3b newColor;
+	uchar r, g, b;
+
+	std::map <int, Vec3b> labelsToColors;
+	for (int i = 1; i <= label; i++)
+	{
+		r = d(gen);
+		g = d(gen);
+		b = d(gen);
+
+		newColor = Vec3b(b, g, r);
+		labelsToColors[i] = newColor;
+	}
+
+	
+	for (int i = 0; i < labels.rows; i++)
+	{
+		for (int j = 0; j < labels.cols; j++)
+		{
+			uchar pixel = labels.at<uchar>(i, j);
+			if (labelsToColors.count(pixel))
+			{
+				Vec3b color = labelsToColors.find(pixel)->second;
+				dst.at<Vec3b>(i, j) = color;
+			}
+			else
+			{
+				dst.at<Vec3b>(i, j) = 255;
+			}
+			
+			
+		}
+	}
+
+
+}
+
+std::vector<Point2i> findNeighborsN8(Mat img, Point2i q)
+{	
+	uchar point;
+	std::vector<Point2i> neighbors;
+
+	for (int i = -1; i <= 1; i++)
+		for (int j = -1; j <= 1; j++)
+		{
+			neighbors.push_back(Point2i(q.x + i, q.y + j));
+			
+		}
+
+	return neighbors;
+	
+}
+
+std::vector<Point2i> findNeighborsN4(Mat img, Point2i q)
+{
+	std::vector<Point2i> neighbors;
+
+	int di[4] = { -1, 0, 1, 0 };
+	int dj[4] = { 0, -1, 0, 1 };
+
+	for (int k = 0; k < 4; k++)
+	{
+		neighbors.push_back(Point2i(q.x + di[k], q.y + dj[k]));
+	}
+
+	return neighbors;
+
+}
+
+std::vector<Point2i> findNeighborNp(Mat img, Point2i q)
+{
+	std::vector<Point2i> neighbors;
+
+	int di[4] = { 0, -1, -1, -1 };
+	int dj[4] = { -1, -1, 0, 1 };
+
+	for (int k = 0; k < 4; k++)
+	{
+		neighbors.push_back(Point2i(q.x + di[k], q.y + dj[k]));
+	}
+
+	return neighbors;
+	
+}
+
+void BFS(Mat img, Mat labels)
+{
+	double t = (double)getTickCount();
+
+	uchar label = 0;
+
+	std::queue<Point2i> Q;
+
+	int height = img.rows;
+	int width = img.cols;
+
+	labels = Mat::zeros(height, width, CV_8UC1);
+
+	Mat dst = Mat(labels.rows, labels.cols, CV_8UC3);
+
+	std::vector<Point2i> neighbors;
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			if (img.at<uchar>(i,j) == 0 && labels.at<uchar>(i,j) == 0)
+			{
+				label++;
+				labels.at<uchar>(i, j) = label;
+				Q.push(Point2i(i, j));
+
+				while (!Q.empty())
+				{
+					Point2i q = Q.front();
+					Q.pop();
+					neighbors = findNeighborsN8(img, q);
+					for (auto &n : neighbors) 
+					{
+						if (img.at<uchar>(n.x,n.y) == 0 && labels.at<uchar>(n.x,n.y) == 0)
+						{
+							labels.at<uchar>(n.x, n.y) = label;
+							Q.push(n);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	t = ((double)getTickCount() - t) / getTickFrequency();
+
+	printf("Time = %.3f [ms]\n", t * 1000);
+
+	colorImage(labels, (int)label, dst);
+
+	imshow("New image", dst);
+
+
+}
+
+void giveLabelBFS()
+{
+	
+	Mat labels, img;
+
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+
+		BFS(img, labels);
+			
+		waitKey(0);
+	}
+
+	
+}
+
+void equivalenceClasses(Mat img, Mat labels)
+{
+	double t = (double)getTickCount();
+
+	int label = 0, newLabel = 0;
+
+	labels = Mat::zeros(img.rows, img.cols, CV_8UC1);
+
+	int height = img.rows;
+	int width = img.cols;
+
+	std::vector<std::vector<int>> edges;
+
+	std::vector<Point2i> neighbors;
+
+	std::queue<int> Q;
+
+	Mat dst = Mat(labels.rows, labels.cols, CV_8UC3);
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			if (img.at<uchar>(i, j) == 0 && labels.at<uchar>(i, j) == 0)
+			{
+				std::vector<int> L;
+
+				neighbors = findNeighborNp(img, Point2i(i, j));
+
+				for (auto &n : neighbors)
+				{
+					if (labels.at<uchar>(n.x, n.y) > 0)
+					{
+						L.push_back(labels.at<uchar>(n.x, n.y));
+					}
+				}
+				if (L.size() == 0)
+				{
+					label++;
+					labels.at<uchar>(i, j) = label;
+				}
+				else
+				{
+					auto min_elem = std::min_element(L.begin(), L.end());
+					int x = *min_elem;
+					labels.at<uchar>(i, j) = x;
+					for (auto &y : L)
+					{
+						if ( y != x )
+						{
+							edges.resize(label + 1);
+							edges[x].push_back(y);
+							edges[y].push_back(x);
+						}
+					}
+				}
+
+
+			}
+		}
+	}
+
+	colorImage(labels, label, dst);
+	imshow("Partial image", dst);
+
+	std::vector<int> newLabels(label+1, 0);
+
+	for (int i = 1; i <= label; i++ )
+	{
+		if (newLabels[i] == 0)
+		{
+			newLabel++;
+			newLabels[i] = newLabel;
+			Q.push(i);
+
+			while(!Q.empty())
+			{
+				int x = Q.front();
+				Q.pop();
+
+				for (auto &y : edges[x])
+				{
+					if (newLabels[y] == 0)
+					{
+						newLabels[y] = newLabel;
+						Q.push(y);
+					}
+				}
+			}
+
+		}
+	}
+
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+		{
+			labels.at<uchar>(i, j) = newLabels[labels.at<uchar>(i, j)];
+		}
+
+	t = ((double)getTickCount() - t) / getTickFrequency();
+
+	printf("Time = %.3f [ms]\n", t * 1000);
+
+	colorImage(labels, newLabel,dst);
+	imshow("New image", dst);
+
+}
+
+void giveLabelEquivalenceClasses()
+{
+	Mat labels, img;
+
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+
+		equivalenceClasses(img, labels);
+
+		waitKey(0);
+	}
+	
+}
+
+void borderTracingAlgorithm(Mat image, Mat dst)
+{
+
+	std::vector <my_point> contour;
+
+	int dj[8] = { 1,  1,  0, -1, -1, -1, 0, 1 }; // rand (coordonata orizontala)
+	int di[8] = { 0, -1, -1, -1,  0,  1, 1, 1 }; // coloana (coordonata verticala)
+
+	byte dir = 7;
+	int x_start, y_start;
+
+	int height = image.rows;
+	int width = image.cols;
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			if (image.at<uchar>(i,j) == 0)
+			{
+				x_start = j;
+				y_start = i;
+				goto label;
+			}
+		}
+	}
+
+	label : std::cout << x_start << " " << y_start << std::endl;
+
+	int n = 0; //indexul primul pixel de contur curent
+	boolean finished = false;
+	int j = x_start;
+	int i = y_start;
+	contour.push_back(my_point{ j,i,dir });
+	byte d;
+
+	int x, y;
+
+	while(!finished)
+	{
+		if (dir % 2 == 0)
+		{
+			dir = (dir + 7) % 8;
+		}
+		else
+		{
+			dir = (dir + 6) % 8;
+		}
+		int k = 0;
+		boolean out = false;
+		while (k <= 7)
+		{
+			d = (dir + k) % 8;
+			x = j + dj[d];
+			y = i + di[d];
+
+			if (image.at<uchar>(y,x) == 0)
+			{
+				dir = d;
+				contour.push_back(my_point{ x, y, dir });
+				j = x;
+				i = y;
+				n++;
+				break;
+			}
+			k++;
+
+		}
+
+		cond :if (n > 1 && contour[0].x  == contour[n-1].x && 
+				contour[1].x == contour[n].x     &&
+				contour[0].y == contour[n - 1].y &&
+				contour[1].y == contour[n].y)
+		{
+			finished = true;
+			
+		}
+	}
+	
+
+	for (int i = 0; i < dst.rows; i++)
+		for (int j = 0 ; j < dst.cols; j++)
+		{
+			dst.at<uchar>(i, j) = 255;
+		}
+
+	for (int i = 0; i < contour.size() - 1; i++)
+	{
+		dst.at<uchar>(contour[i].y, contour[i].x) = 0;
+	}
+
+	for (int i = 0; i < contour.size() - 2; i++)
+	{
+		printf("%d ", contour[i].c);
+	}
+
+	std::vector<byte> chain_code;
+
+	for (int i =0 ; i < contour.size() - 2; i++)
+	{
+		byte value = ((contour[i + 1].c - contour[i].c) + 8) % 8;
+		chain_code.push_back(value);
+	}
+	chain_code.push_back(((contour[i+1].c - contour[i].c) + 8) % 8);
+
+	printf("\n");
+	for (int i = 0; i < chain_code.size(); i++)
+	{
+		printf("%d ", chain_code[i]);
+	}
+
+
+	imshow("New Image", dst);
+	
+}
+
+void borderTracingAlgorithmInit()
+{	
+
+	Mat img, dst;
+
+	char fname[MAX_PATH];
+
+	while (openFileDlg(fname))
+	{
+		img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		dst = img.clone();
+
+		borderTracingAlgorithm(img, dst);
+
+		waitKey(0);
+	}
+
+
+}
+
+void drawObjectContour()
+{
+	
+}
+
+void chainCode()
+{
+	
+}
+
+void derivativeChainCode()
+{
+	
+}
+
+void reconstructsBorderFromChainCode()
+{
+
+	Mat image = Mat(255, 255, CV_8UC1);
+	byte dir = 7;
+
+	FILE* fp = fopen("Images/reconstruct.txt", "rt");
+
+	if (!fp)
+		printf("Error opening the text file !\n");
+
+	int x, y, N,c;
+	fscanf(fp, "%d", &x);
+	fscanf(fp, "%d", &y);
+	fscanf(fp, "%d", &N);
+
+	for (int i = 0; i < N; i++)
+	{
+		image.at<uchar>(y, x) = 255;
+		fscanf(fp, "%d", &c);
+		
+	}
+
+
+
+}
+
 
 int main()
 {
@@ -1275,6 +1795,11 @@ int main()
 		printf(" 20 - Geometrical features of one selected binary object\n");
 		printf(" 21 - Keep objects that have their area < TH_area\n");
 		printf(" 22 - Keep objects that have a specific orientation phi\n");
+		printf(" 23 - Label objects using BFS\n");
+		printf(" 24 - Label objects using equivalence classes\n");
+		printf(" 25 - Tracing border object - draw the contour\n");
+		printf(" 26 - Build the chain code of an image\n");
+		printf(" 27 - Reconstructs the border of an object\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -1342,8 +1867,25 @@ int main()
 				displayGeometricalFeatures();
 				break;
 			case 21:
+				double area;
+				std::cout << "Give area: ";
+				std ::cin >> area;
+				keepObjects(area, 1);
 				break;
 			case 22:
+				double phi;
+				std::cout << "Give phi: ";
+				std::cin >> phi;
+				keepObjects(phi, 0);
+				break;
+			case 23:
+				giveLabelBFS();
+				break;
+			case 24:
+				giveLabelEquivalenceClasses();
+				break;
+			case 25:
+				borderTracingAlgorithmInit();
 				break;
 
 		}
