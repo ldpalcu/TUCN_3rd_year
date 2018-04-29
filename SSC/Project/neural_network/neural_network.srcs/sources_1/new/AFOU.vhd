@@ -32,7 +32,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity AFOU is
-    Port ( Clk : in STD_LOGIC);
+    Port ( Clk : in STD_LOGIC;
+           Z   : in INTEGER;
+           A   : out INTEGER);
 end AFOU;
 
 architecture Behavioral of AFOU is

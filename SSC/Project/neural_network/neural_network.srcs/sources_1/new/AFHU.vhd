@@ -22,6 +22,9 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
+library IEEE_proposed;
+use ieee_proposed.float_pkg.all;
+
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --use IEEE.NUMERIC_STD.ALL;
@@ -32,12 +35,15 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity AFHU is
-    Port ( Clk : in STD_LOGIC);
+    Port ( Clk : in STD_LOGIC;
+           Z : in float(6 downto -10);
+           A : out float(6 downto -10));
 end AFHU;
 
 architecture Behavioral of AFHU is
 
 begin
-
-
+    
+    A <= Z when Z > to_float(0, Z) else to_float(0, Z);
+    
 end Behavioral;
