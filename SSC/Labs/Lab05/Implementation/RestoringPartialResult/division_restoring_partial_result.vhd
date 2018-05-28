@@ -33,8 +33,8 @@ use ieee.std_logic_unsigned.all;
 --use UNISIM.VComponents.all;
 
 entity division_restoring_partial_result is
-  Generic(nd : natural := 16;
-          ni : natural := 8);
+  Generic(nd : natural := 8;
+          ni : natural := 4);
   Port ( Clk   : in STD_LOGIC;
          Rst   : in STD_LOGIC;
          Start : in STD_LOGIC;
@@ -45,9 +45,9 @@ entity division_restoring_partial_result is
 end division_restoring_partial_result;
 
 architecture Behavioral of division_restoring_partial_result is
-signal Sum, Aout  : STD_LOGIC_VECTOR(ni downto 0) := (others => '0');
-signal Tint, Bxor, Bout,Qout, Txor : STD_LOGIC_VECTOR(ni-1 downto 0) := (others => '0');
-signal Tin, LoadB, LoadA, LoadQ, ShlAQ, SubB, Q0: STD_LOGIC;
+signal Sum, Aout, Bxor, Ain, Txor  : STD_LOGIC_VECTOR(ni downto 0) := (others => '0');
+signal Tint, Bout, Qout, Qin : STD_LOGIC_VECTOR(ni-1 downto 0) := (others => '0');
+signal Tin, LoadB, LoadA, LoadQ, ShlAQ, SubB, Q0, SelectValA, SelectValQ: STD_LOGIC := '0';
 
 type TIP_STARE is (idle, init, shift, sub, decision, add, count, stop);
 signal Stare : TIP_STARE;
@@ -67,21 +67,21 @@ begin
             end if;
         end if;
     end process;
-    
-    Areg : process(Clk)
-    begin
-        if rising_edge(Clk) then
-            if Rst = '1' then
-                Aout <= (others => '0');
-            elsif LoadQ = '1' then 
-                Aout <= '0' & X(nd-1 downto nd/2);
-            elsif LoadA = '1' then
-                Aout <= Sum;
-            elsif ShlAQ = '1' then
-                Aout <= Aout(ni-1 downto 0) & Qout(ni-1);
-            end if;
-        end if;
-     end process;
+     
+     Areg : process(Clk)
+     begin
+         if rising_edge(Clk) then
+             if Rst = '1' then
+                 Aout <= (others => '0');
+             elsif LoadA = '1' then 
+                 Aout <= Ain;
+             elsif ShlAQ = '1' then
+                 Aout <= Aout(ni-1 downto 0) & Qout(ni-1);
+             end if;
+         end if;
+      end process;
+      
+      Ain <= '0' & X(nd-1 downto nd/2) when SelectValA = '1' else Sum;
      
      Qreg : process(Clk)
      begin
@@ -89,12 +89,14 @@ begin
             if Rst = '1' then
                 Qout <= (others => '0');
             elsif LoadQ = '1' then
-                Qout <= X(nd/2-1 downto 0);
+                Qout <= Qin;
             elsif ShlAQ = '1' then
                 Qout <= Qout(ni-2 downto 0) & Q0;
             end if;
          end if;
      end process;
+     
+     Qin <= X(nd/2-1 downto 0) when SelectValQ = '1' else Qout(ni-1 downto 1) & Q0;
      
      UC : process(Clk)
      begin
@@ -138,20 +140,19 @@ begin
      
      LoadA <= '1' when (Stare = init or Stare = sub or Stare = add) else '0';
      LoadB <= '1' when Stare = init else '0';
-     LoadQ <= '1' when Stare = init else '0';
+     LoadQ <= '1' when (Stare = init or Stare = count) else '0';
      ShlAQ <= '1' when Stare = shift else '0';
      SubB <= '1' when Stare = sub else '0';
      Term <= '1' when Stare = stop else '0';
-     Q0 <= not Aout(ni) when Stare = decision else Qout(0);
+     Q0 <= not Aout(ni) when Stare = decision;
+     SelectValA <= '1' when Stare = init else '0';
+     SelectValQ <= '1' when Stare = init else '0';
      
      Tin <= SubB;
-     Bxor <= Bout xor Txor;               
+     Bxor <= ('0' & Bout) xor Txor;               
      Txor <= (others => SubB); 
      
      A_Q <= Aout & Qout;         
-        
-     
-            
 
 
 end Behavioral;
