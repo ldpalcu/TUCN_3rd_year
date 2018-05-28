@@ -32,20 +32,20 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity spt is
-  Generic(n : natural);
-  Port (X    : in STD_LOGIC_VECTOR(n downto 0);
-        Y    : in STD_LOGIC_VECTOR(n downto 0);
+  Generic(n : natural := 8);
+  Port (X    : in STD_LOGIC_VECTOR(n-1 downto 0);
+        Y    : in STD_LOGIC_VECTOR(n-1 downto 0);
         Tin  : in STD_LOGIC;
-        S    : out STD_LOGIC_VECTOR(n downto 0);
+        S    : out STD_LOGIC_VECTOR(n-1 downto 0);
         Tout : out STD_LOGIC);
 end spt;
 
 architecture Behavioral of spt is
-signal T : STD_LOGIC_VECTOR(n+1 downto 0);
+signal T : STD_LOGIC_VECTOR(n downto 0);
 begin
     
     T(0) <= Tin;
-    sum : for i in 0 to n generate
+    sum : for i in 0 to n-1 generate
             sum_i : entity WORK.SE 
                         port map(X => X(i),
                                  Y => Y(i),
@@ -53,6 +53,6 @@ begin
                                  S => S(i),
                                  Tout => T(i+1));
          end generate;
-    Tout <= T(n+1);
+    Tout <= T(n);
 
 end Behavioral;

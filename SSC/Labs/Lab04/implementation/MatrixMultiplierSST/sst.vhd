@@ -33,18 +33,18 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity sst is
   Generic( n : natural := 8);
-  Port (X : in STD_LOGIC_VECTOR(n downto 0);
-        Y : in STD_LOGIC_VECTOR(n downto 0);
-        Z : in STD_LOGIC_VECTOR(n downto 0);
-        T : out STD_LOGIC_VECTOR(n downto 0);
-        S : out STD_LOGIC_VECTOR(n downto 0));
+  Port (X : in STD_LOGIC_VECTOR(n-1 downto 0);
+        Y : in STD_LOGIC_VECTOR(n-1 downto 0);
+        Z : in STD_LOGIC_VECTOR(n-1 downto 0);
+        T : out STD_LOGIC_VECTOR(n-1 downto 0);
+        S : out STD_LOGIC_VECTOR(n-1 downto 0));
 end sst;
 
 architecture Behavioral of sst is
 signal Taux : STD_LOGIC;
 begin
 
-    sum : for i in 0 to n generate
+    sum : for i in 0 to n-1 generate
             sum_i : entity WORK.SE 
                         port map(X => X(i),
                                  Y => Y(i),
