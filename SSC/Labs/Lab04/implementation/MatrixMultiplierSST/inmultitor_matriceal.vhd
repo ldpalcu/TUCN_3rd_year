@@ -41,10 +41,11 @@ end inmultitor_matriceal;
 architecture Behavioral of inmultitor_matriceal is
 type MatrixP is array(0 to 7) of std_logic_vector(7 downto 0);
 type MatrixSInt is array(0 to 5) of STD_LOGIC_VECTOR(7 downto 0);
-signal PP : MatrixP;
-signal S_int,T_int,X_Int,S,T : MatrixSint;
+signal PP, PP_int : MatrixP;
+signal T_int,S,T : MatrixSint;
 signal Tout : STD_LOGIC;
 signal Z_Int : STD_LOGIC_VECTOR(8 downto 0);
+signal S_ext, T_Ext : STD_LOGIC_VECTOR(15 downto 0);
 
 begin
 
@@ -63,21 +64,26 @@ begin
                        T => T(0),
                        S => S(0));
                        
-
+    T_int(0) <= T(0)(6 downto 0) & '0';
     sst_gen : for i in 3 to 7 generate
+                --PP_int(i) <= PP(i)(6 downto 0) & '0';              
                 sst_i : entity WORK.sst 
                             generic map(n => 8)
-                            port map(X => PP(3),
-                                     Y => T(i-3),
-                                     Z => S(i-3),
+                            port map(X => PP(i),
+                                     Y => S(i-3),
+                                     Z => T_int(i-3),
                                      T => T(i-3+1),
                                      S => S(i-3+1));
+              T_int(i-3+1) <= T(i-3+1)(6 downto 0) & '0';
+                
               end generate;  
-              
+     
+    
+    --T_int(5) <= T(5)(6 downto 0) & '0';
     spt_gen : entity WORK.spt
                   generic map(n => 8)
                   port map(X => S(5),
-                           Y => T(5),
+                           Y => T_int(5),
                            Tin => '0',
                            S => P(14 downto 7),
                            Tout => Tout);  
