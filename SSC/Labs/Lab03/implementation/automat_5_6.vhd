@@ -75,7 +75,7 @@ begin
                         if Data = '1' then
                             detect <= '1';
                         else
-                            detect <= '1';
+                            detect <= '0';
                         end if;
                         Stare <= s0;
                  end case;
