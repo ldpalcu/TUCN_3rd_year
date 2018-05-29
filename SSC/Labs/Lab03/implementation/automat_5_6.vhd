@@ -38,10 +38,14 @@ begin
                     when s1 =>
                         if Data = '1' then
                             Stare <= s2;
+                        else
+                            Stare <= s0;
                         end if;
                     when s2 =>
                         if Data = '1' then
                             Stare <= s3;
+                        else 
+                            Stare <= s0;
                         end if;
                     when s3 =>
                         if Data = '1' then
@@ -52,6 +56,8 @@ begin
                     when s4 =>
                         if Data = '1' then
                             Stare <= s5;
+                        else
+                            Stare <= s0;
                         end if;
                     when s5 =>
                         if Data = '1' then
@@ -62,12 +68,16 @@ begin
                     when s6 =>
                         if Data = '1' then
                             Stare <= s7;
+                        else
+                            Stare <= s0;
                         end if;
                     when s7 =>
                         if Data = '1' then
                             detect <= '1';
-                            Stare <= s0;
+                        else
+                            detect <= '1';
                         end if;
+                        Stare <= s0;
                  end case;
             end if;
          end if;
