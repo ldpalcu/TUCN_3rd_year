@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="408.0" prefWidth="599.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="presentation.controller.AdminController">
+  <children>
+    <SplitPane dividerPositions="0.9802955665024631" layoutX="0.0" layoutY="1.0" orientation="VERTICAL" prefHeight="408.0" prefWidth="600.0">
+      <items>
+        <AnchorPane fx:id="rootPane" minHeight="0.0" minWidth="0.0" prefHeight="408.0" prefWidth="613.0">
+          <children>
+            <Label layoutX="168.0" layoutY="27.0" prefWidth="263.0" text="What do you want to do today?">
+              <font>
+                <Font size="16.0" />
+              </font>
+            </Label>
+            <Button fx:id="button1" layoutX="69.0" layoutY="100.0" mnemonicParsing="false" onAction="#handleButton1" prefHeight="30.0" prefWidth="144.0" text="Employee Operations" />
+            <Button fx:id="button2" layoutX="358.0" layoutY="101.0" mnemonicParsing="false" onAction="#handleButton2" prefHeight="30.0" prefWidth="144.0" text="Reports" />
+            <Polygon fill="DODGERBLUE" layoutX="84.0" layoutY="281.0" stroke="BLACK" strokeType="INSIDE">
+              <points>
+                <Double fx:value="-50.0" />
+                <Double fx:value="40.0" />
+                <Double fx:value="50.0" />
+                <Double fx:value="40.0" />
+                <Double fx:value="0.0" />
+                <Double fx:value="-60.0" />
+              </points>
+            </Polygon>
+            <Ellipse fill="DODGERBLUE" layoutX="489.0" layoutY="248.0" radiusX="72.0" radiusY="80.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="DODGERBLUE" layoutX="271.0" layoutY="263.0" radius="58.0" stroke="BLACK" strokeType="INSIDE" />
+            <Button fx:id="logout" layoutX="233.0" layoutY="345.0" mnemonicParsing="false" onAction="#logout" prefHeight="30.0" prefWidth="76.0" text="Log Out" />
+          </children>
+        </AnchorPane>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="79.0" prefWidth="598.0">
+          <children>
+            <Line endX="100.0" layoutX="317.0" layoutY="46.0" startX="-100.0" />
+          </children>
+        </AnchorPane>
+      </items>
+    </SplitPane>
+  </children>
+</AnchorPane>

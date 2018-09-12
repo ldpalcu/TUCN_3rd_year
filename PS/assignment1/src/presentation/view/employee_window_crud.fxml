@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="employeePane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="presentation.controller.EmployeeQueriesController">
+  <children>
+    <Pane layoutY="-2.0" prefHeight="410.0" prefWidth="600.0">
+      <children>
+        <ComboBox fx:id="menuClient" layoutX="416.0" layoutY="14.0" prefHeight="21.0" prefWidth="130.0" promptText="Choose option">
+          <items>
+            <FXCollections fx:factory="observableArrayList">
+              <String fx:value="Add" />
+              <String fx:value="Select" />
+              <String fx:value="Update" />
+              <String fx:value="Delete" />
+            </FXCollections>
+          </items>
+        </ComboBox>
+        <ComboBox id="" fx:id="menuAccount" layoutX="416.0" layoutY="203.0" prefHeight="21.0" prefWidth="130.0" promptText="Choose Option">
+          <items>
+            <FXCollections fx:factory="observableArrayList">
+              <String fx:value="Add" />
+              <String fx:value="Select" />
+              <String fx:value="Update" />
+              <String fx:value="Delete" />
+            </FXCollections>
+          </items>
+        </ComboBox>
+        <Label layoutX="222.0" layoutY="14.0" prefWidth="130.0" text="Client Operations">
+          <font>
+            <Font size="14.0" fx:id="x1" />
+          </font>
+        </Label>
+        <Label font="$x1" layoutX="222.0" layoutY="205.0" prefWidth="130.0" text="Account Operations" />
+        <TextField fx:id="idClient" layoutX="218.0" layoutY="50.0" prefWidth="146.9998779296875" promptText="idClient" />
+        <TextField fx:id="name" layoutX="406.0" layoutY="50.0" prefWidth="160.0" promptText="Name" />
+        <TextField fx:id="cardNumber" layoutX="218.0" layoutY="94.0" prefWidth="147.0" promptText="Card Identity Number" />
+        <TextField fx:id="cnp" layoutX="406.0" layoutY="94.0" prefWidth="160.0" promptText="Personal Numeric Code" />
+        <TextField id="adress" fx:id="address" layoutX="218.0" layoutY="141.0" prefWidth="146.9998779296875" promptText="Address" />
+        <TextField fx:id="idAccount" layoutX="218.0" layoutY="240.0" prefWidth="147.0" promptText="idAccount" />
+        <TextField id="Amount" fx:id="amount" layoutX="406.0" layoutY="240.0" prefWidth="160.0" promptText="Amount" />
+        <TextField fx:id="date" layoutX="222.0" layoutY="283.0" prefWidth="146.9998779296875" promptText="Date" />
+        <TextField fx:id="typeAccount" layoutX="406.0" layoutY="282.0" prefWidth="160.0" promptText="Type Account" />
+        <TextField id="idClient" fx:id="idClientAccount" layoutX="223.0" layoutY="324.0" prefWidth="146.9998779296875" promptText="idClient" />
+        <Button id="execute" fx:id="executeClient" layoutX="421.0" layoutY="142.0" mnemonicParsing="false" onAction="#executeClient" prefWidth="130.0" text="Execute" />
+        <Button fx:id="executeAccount" layoutX="416.0" layoutY="366.0" mnemonicParsing="false" onAction="#executeAccount" prefWidth="130.0" text="Execute" />
+        <Button fx:id="backButton" layoutX="14.0" layoutY="372.0" mnemonicParsing="false" onAction="#back" text="Back" />
+        <TextArea fx:id="textAreaClient" layoutX="14.0" layoutY="14.0" prefHeight="158.0" prefWidth="196.0" wrapText="true" />
+        <TextArea fx:id="textAreaAccount" layoutX="12.0" layoutY="203.0" prefHeight="158.0" prefWidth="200.0" wrapText="true" />
+        <TextField fx:id="interestRate" layoutX="406.0" layoutY="324.0" onAction="#executeAccount" prefWidth="160.0" promptText="Interest Rate" />
+        <TextField fx:id="period" layoutX="222.0" layoutY="366.0" onAction="#executeAccount" prefWidth="147.0" promptText="Period" />
+      </children>
+    </Pane>
+  </children>
+</AnchorPane>

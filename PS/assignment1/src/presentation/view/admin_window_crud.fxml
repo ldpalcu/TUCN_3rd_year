@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="presentation.controller.AdminQueriesController">
+  <children>
+    <ComboBox fx:id="menuUser" layoutX="48.0" layoutY="75.0" onAction="#executeUser" prefHeight="21.0" prefWidth="127.0" promptText="Choose Option">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="Add" />
+          <String fx:value="Select" />
+          <String fx:value="Update" />
+          <String fx:value="Delete" />
+        </FXCollections>
+      </items>
+    </ComboBox>
+    <Label layoutX="48.0" layoutY="26.0" prefWidth="158.0" text="Employee's Operations">
+      <font>
+        <Font size="14.0" />
+      </font>
+    </Label>
+    <TextField fx:id="idUser" layoutX="215.0" layoutY="75.0" onAction="#executeUser" prefWidth="158.0" promptText="idUser" />
+    <TextField fx:id="name" layoutX="398.0" layoutY="74.0" onAction="#executeUser" prefWidth="175.0" promptText="Name" />
+    <TextField fx:id="username" layoutX="215.0" layoutY="124.0" onAction="#executeUser" prefWidth="158.0" promptText="Username" />
+    <TextField fx:id="password" layoutX="398.0" layoutY="124.0" onAction="#executeUser" prefWidth="175.0" promptText="Password" />
+    <TextField fx:id="role" layoutX="311.0" layoutY="164.0" onAction="#executeUser" prefWidth="158.0" promptText="Role" />
+    <Button fx:id="back" layoutX="48.0" layoutY="343.0" mnemonicParsing="false" onAction="#back" prefWidth="89.0" text="Back" />
+    <TextArea fx:id="textArea" editable="false" layoutX="210.0" layoutY="211.0" prefHeight="153.0" prefWidth="360.0" wrapText="true" />
+  </children>
+</AnchorPane>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane fx:id="userPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.UserViewImpl">
+  <children>
+    <Pane fx:id="backPane" layoutX="1.0" prefHeight="400.0" prefWidth="600.0">
+      <children>
+        <Button fx:id="backButton" layoutX="24.0" layoutY="346.0" mnemonicParsing="false" onAction="#back" prefWidth="67.0" text="Back" />
+            <TextArea fx:id="textAreaActivities" layoutX="285.0" layoutY="14.0" prefHeight="317.0" prefWidth="301.0" wrapText="true" />
+            <Button fx:id="listActivities" layoutX="20.0" layoutY="14.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="158.0" text="View List of Activities" />
+            <Label layoutX="24.0" layoutY="56.0" prefHeight="16.0" prefWidth="150.0" text="Filter Activities" />
+            <Button fx:id="registerButton" layoutX="153.0" layoutY="297.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="117.0" text="Register" />
+            <TextArea fx:id="textAreaRegister" layoutX="286.0" layoutY="338.0" prefHeight="51.0" prefWidth="301.0" wrapText="true" />
+            <TextField fx:id="idUser" layoutX="20.0" layoutY="297.0" prefHeight="26.0" prefWidth="102.0" promptText="Your Id" />
+            <TextField fx:id="loc" layoutX="151.0" layoutY="147.0" prefHeight="26.0" prefWidth="108.0" promptText="Location" />
+            <TextField fx:id="name" layoutX="22.0" layoutY="200.0" prefHeight="26.0" prefWidth="102.0" promptText="Name" />
+            <TextField fx:id="category" layoutX="154.0" layoutY="200.0" prefHeight="26.0" prefWidth="108.0" promptText="Category" />
+            <TextField fx:id="currentNumberUsers" layoutX="24.0" layoutY="247.0" prefHeight="26.0" prefWidth="102.0" promptText="Current Number Users" />
+            <TextField fx:id="maxUsers" layoutX="155.0" layoutY="247.0" prefHeight="26.0" prefWidth="108.0" promptText="Max Users" />
+            <TextField fx:id="idActivity" layoutX="25.0" layoutY="147.0" prefHeight="26.0" prefWidth="102.0" promptText="idActivity" />
+            <ComboBox fx:id="menuFilter" layoutX="16.0" layoutY="90.0" prefWidth="150.0" promptText="Choose option">
+                  <items>
+                      <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Name" />
+                          <String fx:value="Location" />
+                          <String fx:value="Category" />
+                          <String fx:value="Availability" />
+                          <String fx:value="Location and Category" />
+                          <String fx:value="Name and Category" />
+                          <String fx:value="Name and Location" />
+                      </FXCollections>
+                  </items>
+            </ComboBox>
+      </children>
+    </Pane>
+  </children>
+</AnchorPane>
