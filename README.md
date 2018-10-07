@@ -5,4 +5,3 @@ The lectures are:
 * PI - Image Processing
 * PS - Software Design
 * SI - Intelligent Systems
-* LFT - Formal Languages and Translators
