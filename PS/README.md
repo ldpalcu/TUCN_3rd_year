@@ -1,3 +1,2 @@
-# Proiectare Software 
-Daniela Palcu - 30238
+# Software Desing
 
